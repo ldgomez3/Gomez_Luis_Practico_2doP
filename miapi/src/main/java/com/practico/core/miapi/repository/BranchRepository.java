@@ -5,18 +5,12 @@ import java.util.Optional;
 
 import com.practico.core.miapi.model.Branch;
 
-public class BranchRepository {
+public interface BranchRepository {
 
-    public List<Branch> findAll() {
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
-    }
+    List<Branch> findAll();
 
-    public Branch save(Branch branch) {
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
+    Branch save(Branch branch);
 
-    public Optional<Branch> findById(String id) {
-        throw new UnsupportedOperationException("Unimplemented method 'findById'");
-    }
-    
+    Optional<Branch> findById(String id);
+
 }

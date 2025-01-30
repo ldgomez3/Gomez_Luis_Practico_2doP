@@ -2,14 +2,14 @@ package com.practico.core.miapi.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.practico.core.miapi.controller.dto.BranchDTO;
+import com.practico.core.miapi.controller.dto.HolidayDTO;
 import com.practico.core.miapi.model.Branch;
+import com.practico.core.miapi.model.Holiday;
 import com.practico.core.miapi.repository.BranchRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +39,6 @@ public class BranchService {
         return branchRepository.findById(id);
     }
 
-    // En BranchService.java
     public Branch updateBranchPhoneNumber(String id, String newPhoneNumber) {
         return branchRepository.findById(id)
                 .map(branch -> {
@@ -50,5 +49,40 @@ public class BranchService {
                 .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
     }
 
-    
+    public Branch addHolidayToBranch(String id, HolidayDTO holidayDTO) {
+        return branchRepository.findById(id)
+                .map(branch -> {
+                    Holiday holiday = new Holiday();
+                    holiday.setDate(holidayDTO.getDate());
+                    holiday.setName(holidayDTO.getName());
+                    branch.getBranchHolidays().add(holiday);
+                    branch.setLastModifiedDate(LocalDateTime.now());
+                    return branchRepository.save(branch);
+                })
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+    }
+
+    public Branch removeHolidayFromBranch(String id, LocalDate holidayDate) {
+        return branchRepository.findById(id)
+                .map(branch -> {
+                    branch.getBranchHolidays().removeIf(holiday -> holiday.getDate().equals(holidayDate));
+                    branch.setLastModifiedDate(LocalDateTime.now());
+                    return branchRepository.save(branch);
+                })
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+    }
+
+    public List<Holiday> getBranchHolidays(String id) {
+        return branchRepository.findById(id)
+                .map(Branch::getBranchHolidays)
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+    }
+
+    public boolean isHoliday(String id, LocalDate date) {
+        return branchRepository.findById(id)
+                .map(branch -> branch.getBranchHolidays().stream()
+                        .anyMatch(holiday -> holiday.getDate().equals(date)))
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+    }
+
 }
